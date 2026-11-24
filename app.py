@@ -1,6 +1,6 @@
 import streamlit as st
-from utils.cv_extractor import extract_text_from_uploaded_file
-from utils.ai_analyzer import analyze_cv
+from cv_extractor import extract_text_from_uploaded_file
+from ai_analyzer import analyze_cv
 
 st.set_page_config(
     page_title="AI CV Analyzer",
