@@ -40,7 +40,7 @@ def analyze_cv(cv_text: str, target_role: str = "", experience_level: str = "Not
             "or your local .streamlit/secrets.toml file."
         )
 
-    model = _get_secret("GROQ_MODEL", "llama-3.3-70b-versatile")
+    model = _get_secret("GROQ_MODEL", "openai/gpt-oss-120b")
     client = Groq(api_key=api_key)
 
     # Keep the request bounded to avoid sending an excessively large CV.
