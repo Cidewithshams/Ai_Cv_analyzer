@@ -2,197 +2,95 @@ import streamlit as st
 from cv_extractor import extract_text_from_uploaded_file
 from ai_analyzer import analyze_cv
 
-st.set_page_config(
-    page_title="AI CV Analyzer",
-    page_icon="📄",
-    layout="wide",
-    initial_sidebar_state="expanded",
-)
+st.set_page_config(page_title="TalentLens | AI CV Analyzer", page_icon="✦", layout="wide")
 
 st.markdown("""
 <style>
-    .block-container {padding-top: 2rem; padding-bottom: 3rem; max-width: 1200px;}
-    .hero {padding: 1.5rem 1.7rem; border-radius: 18px;
-           background: linear-gradient(120deg, #14213d, #263b68); color: white; margin-bottom: 1.2rem;}
-    .hero h1 {color: white; margin-bottom: .35rem;}
-    .hero p {color: #e4eaf5; margin-bottom: 0;}
-    .metric-card {padding: 1rem; border: 1px solid rgba(128,128,128,.25);
-                  border-radius: 14px; min-height: 110px;}
-    .muted {color: #7b8494; font-size: .9rem;}
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap');
+html,body,[class*="css"]{font-family:'DM Sans',sans-serif}
+.stApp{background:#f6f7fb;color:#192238}
+.block-container{max-width:1280px;padding-top:1.7rem}
+[data-testid="stSidebar"]{background:#fff;border-right:1px solid #e7eaf1}
+.brand{font:800 1.25rem Manrope;color:#202943}
+.hero{padding:32px 36px;border-radius:22px;color:white;background:linear-gradient(115deg,#17213d,#303b70 62%,#6254d9);margin-bottom:25px;box-shadow:0 15px 35px #26345a20}
+.hero small{color:#c9c7ff;font-weight:700;letter-spacing:2px}
+.hero h1{font:800 2.3rem Manrope;color:white;line-height:1.16;margin:12px 0}
+.hero p{color:#e0e4f5;max-width:680px;font-size:1rem}
+.panel{background:white;border:1px solid #e6eaf1;border-radius:17px;padding:22px;margin-bottom:16px;box-shadow:0 5px 18px #1c2a4608}
+.panel h3{font:700 1.08rem Manrope;color:#202943}
+.sub{color:#8993a5;font-size:.85rem;margin-bottom:16px}
+.kicker{font-size:.72rem;letter-spacing:1.5px;color:#818ba0;font-weight:700;margin:8px 0}
+.metric{background:white;border:1px solid #e6eaf1;border-radius:14px;padding:16px}
+.metric label{font-size:.72rem;color:#8993a5;font-weight:700}
+.metric strong{display:block;font:800 1.7rem Manrope;color:#202943;margin-top:5px}
+.tag{display:inline-block;background:#f0efff;color:#5144c9;border-radius:7px;padding:6px 10px;margin:3px;font-size:.78rem;font-weight:600}
+.tag2{background:#eaf6f1;color:#267457}
+div.stButton>button[kind="primary"]{background:linear-gradient(120deg,#7062ed,#5142c9);border:0;border-radius:11px;color:white;font-weight:700;min-height:46px}
+.stDownloadButton>button{border-radius:10px;font-weight:600}
+div[data-testid="stFileUploader"]{background:#fafaff;border:1px dashed #c9c4f3;border-radius:12px;padding:10px}
+.footer{text-align:center;color:#9aa3b2;font-size:.75rem;padding:22px}
 </style>
 """, unsafe_allow_html=True)
 
 with st.sidebar:
-    st.title("📄 CV Analyzer")
-    st.caption("AI-powered career insights")
+    st.markdown('<div class="brand">✦ &nbsp; TalentLens</div><div style="color:#929bad;font-size:.8rem">AI-powered career intelligence</div>', unsafe_allow_html=True)
     st.divider()
-    st.markdown("### How it works")
-    st.markdown(
-        "1. Upload your CV\n"
-        "2. Select your target role\n"
-        "3. Run the AI analysis\n"
-        "4. Review your career insights"
-    )
+    st.markdown("**WORKSPACE**")
+    st.markdown("✦  CV Analysis")
+    st.markdown("▤  Skills Overview")
+    st.markdown("◎  Career Directions")
     st.divider()
-    st.caption("Your uploaded file is processed in memory and is not saved by this app.")
+    st.markdown("**HOW IT WORKS**")
+    st.caption("01  Upload your CV")
+    st.caption("02  Select your target role")
+    st.caption("03  Generate AI insights")
+    st.caption("04  Review your action plan")
+    st.divider()
+    st.caption("🔒 CV files are processed in memory by this app.")
 
 st.markdown("""
 <div class="hero">
-  <h1>AI CV Analyzer</h1>
-  <p>Understand your skills, identify skill gaps, and explore career directions.</p>
+<small>CAREER INTELLIGENCE · AI POWERED</small>
+<h1>Turn your CV into a<br>clear career direction.</h1>
+<p>Discover the strengths in your profile, identify skills to build, and explore career paths that match your experience.</p>
 </div>
 """, unsafe_allow_html=True)
 
-left, right = st.columns([1.15, 0.85], gap="large")
-
-with left:
-    st.subheader("1. Upload your CV")
-    uploaded_file = st.file_uploader(
-        "Choose a PDF or DOCX file",
-        type=["pdf", "docx"],
-        help="For best results, upload a text-based PDF or a DOCX document.",
-    )
-    st.subheader("2. Choose your career target")
-    target_role = st.text_input(
-        "Target job role (optional)",
-        placeholder="e.g. Junior Python Developer, Data Analyst, UI/UX Designer",
-    )
-    experience_level = st.selectbox(
-        "Your experience level",
-        ["Not specified", "Student / Fresh graduate", "Entry level", "Mid level", "Senior level"],
-    )
-    analyze_button = st.button(
-        "✨ Analyze my CV",
-        type="primary",
-        use_container_width=True,
-        disabled=uploaded_file is None,
-    )
-
-with right:
-    st.subheader("What you'll receive")
-    st.markdown("""
-    - **Skill profile:** technical and soft skills found in your CV
-    - **Skill gaps:** useful skills to develop for your target role
-    - **Career directions:** job roles that may fit your background
-    - **CV feedback:** practical improvements to strengthen your CV
-    - **Action plan:** suggested next learning steps
-    """)
+a,b=st.columns([1.3,.85],gap="large")
+with a:
+    st.markdown('<div class="kicker">01 — START YOUR ANALYSIS</div><div class="panel"><h3>Upload your CV</h3><div class="sub">Add your resume and tell us what role you are working toward.</div>',unsafe_allow_html=True)
+    uploaded=st.file_uploader("Choose a PDF or DOCX file",type=["pdf","docx"])
+    role=st.text_input("Target job title",placeholder="e.g. Python Developer, Data Analyst, UI/UX Designer")
+    c1,c2=st.columns(2)
+    with c1:
+        level=st.selectbox("Experience level",["Not specified","Student / Fresh graduate","Entry level","Mid level","Senior level"])
+    with c2:
+        focus=st.selectbox("Analysis focus",["Full CV review","Technical skills","Career opportunities","CV improvement"])
+    st.markdown('</div>',unsafe_allow_html=True)
+    run=st.button("✦  Analyze my CV",type="primary",use_container_width=True,disabled=uploaded is None)
+with b:
+    st.markdown('<div class="kicker">02 — YOUR CAREER SNAPSHOT</div><div class="panel"><h3>What you will receive</h3><div class="sub">A structured review based on your CV.</div><p>◈ &nbsp; <b>Skills profile</b><br><span class="sub">Technical and transferable strengths</span></p><hr><p>⌁ &nbsp; <b>Potential skill gaps</b><br><span class="sub">Skills worth developing for your target role</span></p><hr><p>◎ &nbsp; <b>Career directions</b><br><span class="sub">Roles that may fit your background</span></p><hr><p>↗ &nbsp; <b>Improvement plan</b><br><span class="sub">Practical ways to strengthen your CV</span></p></div>',unsafe_allow_html=True)
     st.info("AI suggestions are guidance, not a hiring decision or a guarantee of employment.")
 
-if analyze_button and uploaded_file is not None:
+if run and uploaded:
     try:
         with st.spinner("Reading your CV..."):
-            cv_text = extract_text_from_uploaded_file(uploaded_file)
-
-        if len(cv_text.strip()) < 80:
-            st.error(
-                "Not enough readable text was found. If this is a scanned PDF, "
-                "try a text-based PDF or a DOCX file."
-            )
+            text=extract_text_from_uploaded_file(uploaded)
+        if len(text.strip())<80:
+            st.error("Not enough readable text found. Try a text-based PDF or DOCX.")
             st.stop()
+        with st.spinner("TalentLens is analyzing your profile..."):
+            result=analyze_cv(text,role.strip(),level)
+        st.session_state["cv_result"]=result
+        st.session_state["cv_name"]=uploaded.name
+    except Exception as e:
+        st.error(f"Analysis failed: {e}")
+        st.info("The Groq API key must be added in Streamlit Secrets before AI analysis can run.")
 
-        with st.spinner("AI is reviewing your CV. This may take a few moments..."):
-            result = analyze_cv(
-                cv_text=cv_text,
-                target_role=target_role.strip(),
-                experience_level=experience_level,
-            )
-
-        st.session_state["cv_analysis"] = result
-        st.session_state["cv_target_role"] = target_role.strip()
-
-    except Exception as exc:
-        st.error(f"Analysis failed: {exc}")
-        st.caption("Check your Groq API key, model name, internet connection, and uploaded file.")
-
-if "cv_analysis" in st.session_state:
-    result = st.session_state["cv_analysis"]
-    st.divider()
-    st.header("Your CV analysis")
-
-    score = result.get("overall_profile_score")
-    summary = result.get("profile_summary", "No summary was returned.")
-    if isinstance(score, (int, float)):
-        st.metric("Profile readiness score", f"{max(0, min(100, int(score)))}/100")
-    st.write(summary)
-
-    skills = result.get("skills", {})
-    c1, c2 = st.columns(2)
-    with c1:
-        st.subheader("Technical skills")
-        technical = skills.get("technical", [])
-        if technical:
-            st.write(" · ".join(str(x) for x in technical))
-        else:
-            st.write("No technical skills identified.")
-    with c2:
-        st.subheader("Soft skills")
-        soft = skills.get("soft", [])
-        if soft:
-            st.write(" · ".join(str(x) for x in soft))
-        else:
-            st.write("No soft skills identified.")
-
-    st.subheader("Potential skill gaps")
-    gaps = result.get("missing_skills", [])
-    if gaps:
-        for item in gaps:
-            if isinstance(item, dict):
-                st.markdown(f"**{item.get('skill', 'Skill')}** — {item.get('why_it_matters', '')}")
-                if item.get("priority"):
-                    st.caption(f"Priority: {item['priority']}")
-            else:
-                st.write(f"• {item}")
-    else:
-        st.write("No specific skill gaps were returned.")
-
-    st.subheader("Career opportunities to explore")
-    opportunities = result.get("career_opportunities", [])
-    if opportunities:
-        for item in opportunities:
-            if isinstance(item, dict):
-                with st.expander(item.get("job_title", "Suggested role")):
-                    st.write(item.get("why_it_fits", ""))
-                    if item.get("skills_to_build"):
-                        st.markdown("**Skills to build:** " + ", ".join(item["skills_to_build"]))
-            else:
-                st.write(f"• {item}")
-    else:
-        st.write("No career suggestions were returned.")
-
-    st.subheader("CV improvement suggestions")
-    suggestions = result.get("cv_improvements", [])
-    for suggestion in suggestions:
-        st.markdown(f"- {suggestion}")
-
-    st.subheader("Suggested action plan")
-    action_plan = result.get("action_plan", [])
-    for step in action_plan:
-        st.markdown(f"- {step}")
-
-    st.caption(result.get("limitations", "This analysis is based only on the text available in the uploaded CV."))
-    report_text = "# AI CV Analyzer Report\n\n"
-    report_text += f"## Profile summary\n{summary}\n\n"
-    report_text += f"## Technical skills\n{', '.join(map(str, skills.get('technical', [])))}\n\n"
-    report_text += f"## Soft skills\n{', '.join(map(str, skills.get('soft', [])))}\n\n"
-    report_text += "## Missing skills\n" + "\n".join(
-        f"- {x.get('skill')}: {x.get('why_it_matters', '')}" if isinstance(x, dict) else f"- {x}"
-        for x in gaps
-    ) + "\n\n"
-    report_text += "## Career opportunities\n" + "\n".join(
-        f"- {x.get('job_title')}: {x.get('why_it_fits', '')}" if isinstance(x, dict) else f"- {x}"
-        for x in opportunities
-    ) + "\n\n"
-    report_text += "## CV improvements\n" + "\n".join(f"- {x}" for x in suggestions)
-    report_text += "\n\n## Action plan\n" + "\n".join(f"- {x}" for x in action_plan)
-
-    st.download_button(
-        "⬇️ Download analysis report",
-        data=report_text,
-        file_name="cv_analysis_report.md",
-        mime="text/markdown",
-        use_container_width=True,
-    )
-
-st.divider()
-st.caption("Privacy note: Avoid uploading CVs containing information you do not want processed by an AI service. The CV text is sent to Groq to generate the analysis. This starter app does not store uploaded CVs or analysis results in a database.")
+if "cv_result" in st.session_state:
+    r=st.session_state["cv_result"]
+    skills=r.get("skills",{}) or {}
+    tech=skills.get("technical",[]) or []
+    soft=skills.get("soft",[]) or []
+    gaps=r.get("missing_skills",[]) or []
+    jobs=r.get("career_opportunities",[]) or []
