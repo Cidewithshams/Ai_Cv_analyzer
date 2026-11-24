@@ -44,7 +44,7 @@ def analyze_cv(cv_text: str, target_role: str = "", experience_level: str = "Not
     client = Groq(api_key=api_key)
 
     # Keep the request bounded to avoid sending an excessively large CV.
-    cv_text = cv_text[:18000]
+   cv_text = cv_text[:9000]
 
     system_prompt = """
 You are a careful career coach and CV reviewer. Analyze only information supported by the CV.
@@ -96,7 +96,7 @@ Analyze this CV and return the JSON object requested.
                 {"role": "user", "content": user_prompt},
             ],
             temperature=0.2,
-            max_tokens=2200,
+            max_tokens=1200,
             response_format={"type": "json_object"},
         )
         content = response.choices[0].message.content or "{}"
