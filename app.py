@@ -1,9 +1,7 @@
 import streamlit as st
 from cv_extractor import extract_text_from_uploaded_file
 from ai_analyzer import analyze_cv
-
 st.set_page_config(page_title="TalentLens | AI CV Analyzer", page_icon="✦", layout="wide")
-
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap');
