@@ -1,6 +1,5 @@
 import streamlit as st
 from cv_extractor import extract_text_from_uploaded_file
-import streamlit as st
 from ai_analyzer import analyze_cv
 
 st.set_page_config(page_title="TalentLens | AI CV Analyzer", page_icon="✦", layout="wide")
@@ -57,41 +56,101 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-a,b=st.columns([1.3,.85],gap="large")
+a, b = st.columns([1.3, .85], gap="large")
 with a:
-    st.markdown('<div class="kicker">01 — START YOUR ANALYSIS</div><div class="panel"><h3>Upload your CV</h3><div class="sub">Add your resume and tell us what role you are working toward.</div>',unsafe_allow_html=True)
-    uploaded=st.file_uploader("Choose a PDF or DOCX file",type=["pdf","docx"])
-    role=st.text_input("Target job title",placeholder="e.g. Python Developer, Data Analyst, UI/UX Designer")
-    c1,c2=st.columns(2)
+    st.markdown('<div class="kicker">01 — START YOUR ANALYSIS</div><div class="panel"><h3>Upload your CV</h3><div class="sub">Add your resume and tell us what role you are working toward.</div>', unsafe_allow_html=True)
+    uploaded = st.file_uploader("Choose a PDF or DOCX file", type=["pdf", "docx"])
+    role = st.text_input("Target job title", placeholder="e.g. Python Developer, Data Analyst, UI/UX Designer")
+    c1, c2 = st.columns(2)
     with c1:
-        level=st.selectbox("Experience level",["Not specified","Student / Fresh graduate","Entry level","Mid level","Senior level"])
+        level = st.selectbox("Experience level", ["Not specified", "Student / Fresh graduate", "Entry level", "Mid level", "Senior level"])
     with c2:
-        focus=st.selectbox("Analysis focus",["Full CV review","Technical skills","Career opportunities","CV improvement"])
-    st.markdown('</div>',unsafe_allow_html=True)
-    run=st.button("✦  Analyze my CV",type="primary",use_container_width=True,disabled=uploaded is None)
+        focus = st.selectbox("Analysis focus", ["Full CV review", "Technical skills", "Career opportunities", "CV improvement"])
+    st.markdown('</div>', unsafe_allow_html=True)
+    run = st.button("✦  Analyze my CV", type="primary", use_container_width=True, disabled=uploaded is None)
+
 with b:
-    st.markdown('<div class="kicker">02 — YOUR CAREER SNAPSHOT</div><div class="panel"><h3>What you will receive</h3><div class="sub">A structured review based on your CV.</div><p>◈ &nbsp; <b>Skills profile</b><br><span class="sub">Technical and transferable strengths</span></p><hr><p>⌁ &nbsp; <b>Potential skill gaps</b><br><span class="sub">Skills worth developing for your target role</span></p><hr><p>◎ &nbsp; <b>Career directions</b><br><span class="sub">Roles that may fit your background</span></p><hr><p>↗ &nbsp; <b>Improvement plan</b><br><span class="sub">Practical ways to strengthen your CV</span></p></div>',unsafe_allow_html=True)
+    st.markdown('<div class="kicker">02 — YOUR CAREER SNAPSHOT</div><div class="panel"><h3>What you will receive</h3><div class="sub">A structured review based on your CV.</div><p>◈ &nbsp; <b>Skills profile</b><br><span class="sub">Technical and transferable strengths</span></p><hr><p>⌁ &nbsp; <b>Potential skill gaps</b><br><span class="sub">Skills worth developing for your target role</span></p><hr><p>◎ &nbsp; <b>Career directions</b><br><span class="sub">Roles that may fit your background</span></p><hr><p>↗ &nbsp; <b>Improvement plan</b><br><span class="sub">Practical ways to strengthen your CV</span></p></div>', unsafe_allow_html=True)
     st.info("AI suggestions are guidance, not a hiring decision or a guarantee of employment.")
 
 if run and uploaded:
     try:
         with st.spinner("Reading your CV..."):
-            text=extract_text_from_uploaded_file(uploaded)
-        if len(text.strip())<80:
+            text = extract_text_from_uploaded_file(uploaded)
+        if len(text.strip()) < 80:
             st.error("Not enough readable text found. Try a text-based PDF or DOCX.")
             st.stop()
         with st.spinner("TalentLens is analyzing your profile..."):
-            result=analyze_cv(text,role.strip(),level)
-        st.session_state["cv_result"]=result
-        st.session_state["cv_name"]=uploaded.name
+            result = analyze_cv(text, role.strip(), level)
+        st.session_state["cv_result"] = result
+        st.session_state["cv_name"] = uploaded.name
     except Exception as e:
         st.error(f"Analysis failed: {e}")
         st.info("The Groq API key must be added in Streamlit Secrets before AI analysis can run.")
 
 if "cv_result" in st.session_state:
-    r=st.session_state["cv_result"]
-    skills=r.get("skills",{}) or {}
-    tech=skills.get("technical",[]) or []
-    soft=skills.get("soft",[]) or []
-    gaps=r.get("missing_skills",[]) or []
-    jobs=r.get("career_opportunities",[]) or []
+    r = st.session_state["cv_result"]
+    skills = r.get("skills", {}) or {}
+    tech = skills.get("technical", []) or []
+    soft = skills.get("soft", []) or []
+    gaps = r.get("missing_skills", []) or []
+    jobs = r.get("career_opportunities", []) or []
+    summary = r.get("summary", "")
+    improvements = r.get("improvements", []) or []
+    score = r.get("score", 0)
+
+    st.markdown(f'<div class="kicker">03 — RESULTS FOR {st.session_state.get("cv_name", "")}</div>', unsafe_allow_html=True)
+
+    m1, m2, m3 = st.columns(3)
+    with m1:
+        st.markdown(f'<div class="metric"><label>OVERALL SCORE</label><strong>{score}/100</strong></div>', unsafe_allow_html=True)
+    with m2:
+        st.markdown(f'<div class="metric"><label>TECHNICAL SKILLS</label><strong>{len(tech)}</strong></div>', unsafe_allow_html=True)
+    with m3:
+        st.markdown(f'<div class="metric"><label>SKILL GAPS</label><strong>{len(gaps)}</strong></div>', unsafe_allow_html=True)
+
+    if summary:
+        st.markdown(f'<div class="panel"><h3>Summary</h3><p>{summary}</p></div>', unsafe_allow_html=True)
+
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown('<div class="panel"><h3>Technical Skills</h3>', unsafe_allow_html=True)
+        if tech:
+            for s in tech:
+                st.markdown(f'<span class="tag">{s}</span>', unsafe_allow_html=True)
+        else:
+            st.write("No technical skills found.")
+        st.markdown('</div>', unsafe_allow_html=True)
+
+        st.markdown('<div class="panel"><h3>Soft Skills</h3>', unsafe_allow_html=True)
+        if soft:
+            for s in soft:
+                st.markdown(f'<span class="tag tag2">{s}</span>', unsafe_allow_html=True)
+        else:
+            st.write("No soft skills found.")
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    with col2:
+        st.markdown('<div class="panel"><h3>Missing Skills / Gaps</h3>', unsafe_allow_html=True)
+        if gaps:
+            for g in gaps:
+                st.markdown(f"- {g}")
+        else:
+            st.write("No major gaps found.")
+        st.markdown('</div>', unsafe_allow_html=True)
+
+        st.markdown('<div class="panel"><h3>Career Opportunities</h3>', unsafe_allow_html=True)
+        if jobs:
+            for j in jobs:
+                st.markdown(f"- {j}")
+        else:
+            st.write("No career suggestions yet.")
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    if improvements:
+        st.markdown('<div class="panel"><h3>Improvement Plan</h3>', unsafe_allow_html=True)
+        for imp in improvements:
+            st.markdown(f"- {imp}")
+        st.markdown('</div>', unsafe_allow_html=True)
+
+st.markdown('<div class="footer">TalentLens · Built with Streamlit & Groq</div>', unsafe_allow_html=True)
