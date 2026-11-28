@@ -1,4 +1,4 @@
 streamlit
 groq
-PyMuPDF
+pypdf
 python-docx
